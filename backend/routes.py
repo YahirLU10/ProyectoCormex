@@ -303,3 +303,80 @@ def eliminar_ruta(id_ruta: int):
         if conexion.is_connected():
             cursor.close()
             conexion.close()
+
+    # --- ENDPOINT: Obtener Ciudad por ID ---
+@router.get("/ciudades/{id_ciudad}", response_model=CiudadResponse)
+def obtener_ciudad(id_ciudad: int):
+    conexion = obtener_conexion()
+    if not conexion:
+        raise HTTPException(status_code=500, detail="Error de conexión a la BD")
+    
+    try:
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute("SELECT id_ciudad, nombre_ciudad FROM ciudades WHERE id_ciudad = %s", (id_ciudad,))
+        ciudad = cursor.fetchone()
+        
+        if not ciudad:
+            raise HTTPException(status_code=404, detail="Ciudad no encontrada.")
+            
+        return ciudad
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conexion.is_connected():
+            cursor.close()
+            conexion.close()
+
+# --- ENDPOINT: Obtener Empleados Activos por Ciudad ---
+@router.get("/empleados/ciudad/{id_ciudad}", response_model=List[EmpleadoResponse])
+def obtener_empleados_por_ciudad(id_ciudad: int):
+    conexion = obtener_conexion()
+    if not conexion:
+        raise HTTPException(status_code=500, detail="Error de conexión a la BD")
+    
+    try:
+        cursor = conexion.cursor(dictionary=True)
+        # Filtramos por ciudad y nos aseguramos de que no estén dados de baja
+        sql = "SELECT * FROM empleados WHERE id_ciudad = %s AND activo = TRUE"
+        cursor.execute(sql, (id_ciudad,))
+        empleados = cursor.fetchall()
+        return empleados
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conexion.is_connected():
+            cursor.close()
+            conexion.close()
+
+# --- ENDPOINT: Obtener Rutas por Ciudad ---
+@router.get("/rutas/ciudad/{id_ciudad}", response_model=List[RutaListResponse])
+def obtener_rutas_por_ciudad(id_ciudad: int):
+    conexion = obtener_conexion()
+    if not conexion:
+        raise HTTPException(status_code=500, detail="Error de conexión a la BD")
+    
+    try:
+        cursor = conexion.cursor(dictionary=True)
+        sql = """
+            SELECT 
+                r.id_ruta, 
+                r.nombre_ruta, 
+                r.tipo_servicio, 
+                r.capacidad,
+                c.nombre_ciudad, 
+                e.nombre_empleado, 
+                e.apellido_paterno
+            FROM rutas r
+            INNER JOIN ciudades c ON r.id_ciudad = c.id_ciudad
+            INNER JOIN empleados e ON r.id_empleado = e.id_empleado
+            WHERE r.id_ciudad = %s
+        """
+        cursor.execute(sql, (id_ciudad,))
+        rutas = cursor.fetchall()
+        return rutas
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conexion.is_connected():
+            cursor.close()
+            conexion.close()
