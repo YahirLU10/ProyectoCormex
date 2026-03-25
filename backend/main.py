@@ -23,6 +23,8 @@ app.add_middleware(
 # --- Rutas de la API ---
 app.include_router(api_router, prefix="/api")
 
+
+# APIS de prueba para la conexion de la DB.
 @app.get("/")
 def raiz():
     return {"mensaje": "¡Bienvenido a la API de Cormex!"}

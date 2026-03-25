@@ -29,8 +29,6 @@ def obtener_ciudades():
 
 @router.post("/empleados")
 def crear_empleado(empleado: EmpleadoCreate):
-    # La validación de edad ya está en el modelo EmpleadoCreate si usaste Pydantic, 
-    # pero está bien dejarla aquí como doble validación si lo prefieres.
     hoy = date.today()
     edad = hoy.year - empleado.fecha_nacimiento.year - ((hoy.month, hoy.day) < (empleado.fecha_nacimiento.month, empleado.fecha_nacimiento.day))
     
@@ -195,9 +193,7 @@ def obtener_rutas():
 # --- ENDPOINT ACTUALIZADO PARA EMPLEADOS (Solo fecha de nacimiento y sueldo) ---
 @router.put("/empleados/{id_empleado}")
 def actualizar_empleado(id_empleado: int, empleado: EmpleadoUpdate):
-    
-    # Si pusiste la validación en el modelo Pydantic, esta parte es opcional, 
-    # pero la dejamos para doble chequeo.
+
     hoy = date.today()
     edad = hoy.year - empleado.fecha_nacimiento.year - ((hoy.month, hoy.day) < (empleado.fecha_nacimiento.month, empleado.fecha_nacimiento.day))
     
@@ -210,7 +206,7 @@ def actualizar_empleado(id_empleado: int, empleado: EmpleadoUpdate):
         
     try:
         cursor = conexion.cursor()
-        # Solo actualizamos fecha de nacimiento y sueldo
+
         sql = """
             UPDATE empleados 
             SET fecha_nacimiento = %s, 

@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import EmpleadosPage from './pages/EmpleadosPage';
 import RutasPage from './pages/RutasPage';
 
-// --- NUEVA PANTALLA DE BIENVENIDA ---
+// --- PANTALLA DE BIENVENIDA ---
 const HomePage = () => (
   <div className="container mt-5 pt-4 text-center">
     <div className="card shadow border-0 rounded-4 mx-auto" style={{ maxWidth: '750px' }}>
